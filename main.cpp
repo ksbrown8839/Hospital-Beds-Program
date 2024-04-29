@@ -18,12 +18,12 @@ using std::ifstream;
 const int FLOOR_ARRAY_SIZE = 5;
 const int ROOM_ARRAY_SIZE = 8;
 
-//	Transfers are represented by a ‘T’.
-//	The Check outs are represented by a ‘C’.
-//	Nurse work stations are represented by a ‘W’.
-//	Occupied rooms are represented by an asterisk ‘O’.
-//	A vacant room is represented by a blank ‘V’.
-//	The utility rooms are represented by an ‘X’.
+//	Transfers are represented by a â€˜Tâ€™.
+//	The Check outs are represented by a â€˜Câ€™.
+//	Nurse work stations are represented by a â€˜Wâ€™.
+//	Occupied rooms are represented by an asterisk â€˜Oâ€™.
+//	A vacant room is represented by a blank â€˜Vâ€™.
+//	The utility rooms are represented by an â€˜Xâ€™.
 
 const char VACANT = 'V';
 const char CHECKOUT = 'C';
@@ -90,6 +90,12 @@ void readGrid(char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE])
     ifstream inputFile;
     inputFile.open("Beds1.txt");
 
+    if (!inputFile)
+    {
+        std::cerr << "Input file failed to load!\n";
+        return;
+    }
+
     for (int i = 0; i < FLOOR_ARRAY_SIZE; i++)
     {
         for (int j = 0; j < ROOM_ARRAY_SIZE; j++)
@@ -121,6 +127,8 @@ void readGrid(char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE])
             }
         }
     }
+   
+    inputFile.close();
 }
 
 

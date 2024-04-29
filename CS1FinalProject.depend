@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1714425583 source:c:\users\ksbro\onedrive\documents\university of akron\cs1finalproject\main.cpp
+	<iostream>
+	<iomanip>
+	<fstream>
+	<limits>
+

@@ -8,7 +8,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <limits>
+#include <limits> //for ignoring and clearing input
 
 
 using std::cout;
@@ -39,73 +39,78 @@ const char INVALID = '@';
 
 //Function prototypes
 /*
-Pre and Post condition comments go here ... Prints the grid to the screen
+Precondition: Function is passed a constant character array for hospital grid
+Postcondition: Returns nothing - prints out hospital grid to standard output
 */
 void printGrid(const char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE]);
 
 /*
-Pre and Post condition comments go here ... Reads in the initial grid from Beds.txt file
+Precondition: Function is passed an existing character array - in this case, it is the hospital grid
+Postcondition: Returns nothing - has read data from the input file, converted to chars, and stored in hospital array
 */
 void readGrid(char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE]);
 
 
 /*
-Pre and Post condition comments go here ... Perform the checkouts
+Precondition: Function is passed the hospital floors array to be adjusted
+Postcondition: Returns nothing - checks all of elements of the array for "checkout" and replaces them with "vacant"
 */
 void checkOuts(char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE]);
 
 /*
-Pre and Post condition comments go here ...Perform the transfers and build the dynamic array of pointers.
-this function also will compute the available number of rooms
+Precondition: Function is passed the hospital floors array after processing checkouts and the initial amount of vacant rooms (0)
+Postcondition: Returns a dynamically allocated array of pointers, with each index of the array storying the memory address of a vacant room.
+               Also, "transfers" have been processed by effectively switching memory locations with a different vacant room
 */
 char** transfers(char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE], int &);
 
 /*
-Pre and Post condition comments go here ...Perform the new patient adds passing the new patient input from
-the nurse station and passing the dynamic array of vacancies count for updating
+Precondition: Function is passed the new patients, amount of vacant rooms, and pointer array of vacant rooms
+Postcondition: Returns nothing - uses dynamic pointer array to fill all the vacant rooms based on how many patients are provided from standard input
 */
 void newPatient(int, int &, char **);
 
 /*
- Pre and Post condition comments go here ... function for the input from the nurse's station. It returns
- the nurse station choice, passes the current vacancies.
+Precondition: Function is passed the amount of vacant rooms
+Postcondition: Returns the user input (amount of new patients), which has been validated
 */
 int newPatientInput(int);
 
 
 int main()
-{
+{   //initial variable declarations/initializations to be used throughout program
     char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE];
     char **VacArray;
     int VacTotal = 0;
     bool loopFlag = true;
     int admitted = 0;
 
+    //function calls for reading input file and printing out grid
     readGrid(hospitalFloors);
     printGrid(hospitalFloors);
-    cout << "Grid Loaded" << endl;
+    cout << "Grid Loaded" << endl << endl;
+
+    //calling checkout and transfer functions to updated hospital floor array
     checkOuts(hospitalFloors);
     VacArray = transfers(hospitalFloors, VacTotal);
     printGrid(hospitalFloors);
-    cout << "Checkouts and Transfers Completed" << endl;
+    cout << "Checkouts and Transfers Completed" << endl << endl;
 
+    //takes user input to determine how many new patients, and where they should go
     while (VacTotal != 0)
     {
-        if (VacTotal == 0)
-        {
-            break;
-        }
         admitted = newPatientInput(VacTotal);
         newPatient(admitted, VacTotal, VacArray);
         printGrid(hospitalFloors);
-        cout << "New patient updates completed" << endl;
+        cout << "New patient updates completed" << endl << endl;
     }
 
 
     cout << "*** No more rooms are available today ***" << endl;
 
-    VacArray = nullptr;
+    //memory de-allocation
     delete [] VacArray;
+    VacArray = nullptr;
     return 4;
 }
 
@@ -115,12 +120,13 @@ void readGrid(char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE])
     ifstream inputFile;
     inputFile.open("Beds1.txt");
 
-     if (!inputFile)
+     if (!inputFile) //verify input file can be read
     {
         std::cerr << "Input file failed to load!\n";
         return;
     }
 
+    //converts integers from input file and stores them as characters in hospital array
     for (int i = 0; i < FLOOR_ARRAY_SIZE; i++)
     {
         for (int j = 0; j < ROOM_ARRAY_SIZE; j++)
@@ -177,7 +183,7 @@ void checkOuts(char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE])
     {
         for (int j = 0; j < ROOM_ARRAY_SIZE; j++)
         {
-            if (hospitalFloors[i][j] == CHECKOUT)
+            if (hospitalFloors[i][j] == CHECKOUT) //for converting all checkouts to vacants
             {
                 hospitalFloors[i][j] = VACANT;
             }
@@ -187,31 +193,48 @@ void checkOuts(char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE])
 
 char** transfers(char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE], int& VacantRooms)
 {
-    char** DblPtrArray = new char*[VacantRooms];
-
     for (int i = 0; i < FLOOR_ARRAY_SIZE; i++)
     {
         for (int j = 0; j < ROOM_ARRAY_SIZE; j++)
         {
 
-            if (hospitalFloors[i][j] == VACANT)
+            if (hospitalFloors[i][j] == VACANT) //counts total amount of vacant rooms
             {
                 VacantRooms++;
-                DblPtrArray[VacantRooms] = &hospitalFloors[i][j];
             }
         }
     }
 
-    int indexPtr = VacantRooms;
+    char** DblPtrArray = new char*[VacantRooms]; //declare array of pointers to hold memory addresses of hospital rooms
+    int vacIndex = 0;
 
     for (int i = 0; i < FLOOR_ARRAY_SIZE; i++)
     {
         for (int j = 0; j < ROOM_ARRAY_SIZE; j++)
         {
 
+            //for each instance of vacant, stores its memory address in the dynamic array at a specific index
+            if (hospitalFloors[i][j] == VACANT)
+            {
+                DblPtrArray[vacIndex] = &hospitalFloors[i][j];
+                vacIndex++;
+            }
+        }
+    }
+
+    int indexPtr = VacantRooms - 1;
+
+    for (int i = 0; i < FLOOR_ARRAY_SIZE; i++)
+    {
+        for (int j = 0; j < ROOM_ARRAY_SIZE; j++)
+        {
+            /*  Does the actual transferring - finds each instance of transfer
+                Accesses last slot of dynamic array to put the patient in, and sets to occupied.
+                Sets the current room as vacant
+                Stores the newly vacant room in the dynamic array
+            */
             if (hospitalFloors[i][j] == TRANSFER)
             {
-
                 **(DblPtrArray + indexPtr) = OCCUPIED;
                 hospitalFloors[i][j] = VACANT;
                 *(DblPtrArray + indexPtr) = &hospitalFloors[i][j];
@@ -227,7 +250,7 @@ int newPatientInput(int VacantRooms)
     int userInput;
     bool validate = true;
 
-    while (validate)
+    while (validate) // repeats until user enters good data and returns the amount of new patients
     {
         cout << "Please enter the number of new patients, from one up to " << VacantRooms << ". (Quit with -1): ";
         cin >> userInput;
@@ -253,13 +276,13 @@ int newPatientInput(int VacantRooms)
 
 void newPatient(int admitted, int& VacantRooms, char** DblPtrArray)
 {
-    for (int arrCount = VacantRooms; arrCount >= 0; --arrCount)
+    for (int indexPtr = VacantRooms - 1; indexPtr >= 0; indexPtr--)
     {
-        if(admitted == 0)
+        if(admitted == 0) //loops based on how many new patients there are. Starts at the very back of the dynamic array with storing new patients and counts down
         {
             break;
         }
-        **(DblPtrArray + arrCount) = OCCUPIED;
+        **(DblPtrArray + indexPtr) = OCCUPIED;
         VacantRooms--;
         admitted--;
     }

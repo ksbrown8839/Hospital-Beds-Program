@@ -100,9 +100,17 @@ int main()
     while (VacTotal != 0)
     {
         admitted = newPatientInput(VacTotal);
-        newPatient(admitted, VacTotal, VacArray);
-        printGrid(hospitalFloors);
-        cout << "New patient updates completed" << endl << endl;
+
+        if (admitted == -1)
+        {
+            break;
+        }
+        else
+        {
+            newPatient(admitted, VacTotal, VacArray);
+            printGrid(hospitalFloors);
+            cout << "New patient updates completed" << endl << endl;
+        }
     }
 
 
@@ -205,7 +213,7 @@ char** transfers(char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE], int& Va
         }
     }
 
-    char** DblPtrArray = new char*[VacantRooms]; //declare array of pointers to hold memory addresses of hospital rooms
+    char** DblPtrArray = new char*[VacantRooms]; //declares pointer array of pointers to hold memory addresses of hospital rooms
     int vacIndex = 0;
 
     for (int i = 0; i < FLOOR_ARRAY_SIZE; i++)
@@ -262,7 +270,7 @@ int newPatientInput(int VacantRooms)
         else if (userInput == -1)
         {
             cout << "Goodbye" << endl;
-            exit(4);
+            return -1;
         }
         else
         {

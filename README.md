@@ -1,7 +1,7 @@
 # CSI Project
 
 ## Author
-Kollin Brown (ksb91)
+Kollin Brown
 
 ## Version
 1.01 - April 24, 2024

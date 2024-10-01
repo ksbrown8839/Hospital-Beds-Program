@@ -19,12 +19,12 @@ using std::ifstream;
 const int FLOOR_ARRAY_SIZE = 5;
 const int ROOM_ARRAY_SIZE = 8;
 
-//	Transfers are represented by a ‘T’.
-//	The Check outs are represented by a ‘C’.
-//	Nurse work stations are represented by a ‘W’.
-//	Occupied rooms are represented by an asterisk ‘O’.
-//	A vacant room is represented by a blank ‘V’.
-//	The utility rooms are represented by an ‘X’.
+//	Transfers are represented by a â€˜Tâ€™.
+//	The Check outs are represented by a â€˜Câ€™.
+//	Nurse work stations are represented by a â€˜Wâ€™.
+//	Occupied rooms are represented by an asterisk â€˜Oâ€™.
+//	A vacant room is represented by a blank â€˜Vâ€™.
+//	The utility rooms are represented by an â€˜Xâ€™.
 
 const char VACANT = 'V';
 const char CHECKOUT = 'C';
@@ -82,7 +82,6 @@ int main()
     char hospitalFloors[FLOOR_ARRAY_SIZE][ROOM_ARRAY_SIZE];
     char **VacArray;
     int VacTotal = 0;
-    bool loopFlag = true;
     int admitted = 0;
 
     //function calls for reading input file and printing out grid
